@@ -8,11 +8,11 @@ func Name(num int) string {
 	return names[num]
 }
 
-func Number(name string) uint8 {
+func Number(name string) int {
 	return numbers[strings.ToLower(name)]
 }
 
-func NumberOK(name string) (uint8, bool) {
+func NumberOK(name string) (int, bool) {
 	num, ok := numbers[strings.ToLower(name)]
 	return num, ok
 }
@@ -276,7 +276,7 @@ var names = []string{
 	"Grey93",
 }
 
-var numbers = map[string]uint8{
+var numbers = map[string]int{
 	"black":             0,
 	"red":               1,
 	"green":             2,
