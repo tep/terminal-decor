@@ -1,82 +1,41 @@
 // Copyright © 2023 Timothy E. Peoples
 
-package termcolor
+package decor
 
 import (
-	"fmt"
-	"strconv"
+	"toolman.org/terminal/decor/internal/item"
+	"toolman.org/terminal/decor/internal/series"
 )
 
-var DEBUG bool
+func (d *Decorator) Format(text string) (string, error) {
+	ss := series.New()
 
-func (t *Term) Format(mesg string) (string, error) {
-	segments, err := segmentize(mesg)
-	if err != nil {
+	if err := ss.Parse(text); err != nil {
 		return "", err
 	}
 
+	return d.format(ss)
+}
+
+func (d *Decorator) format(ss *series.Series) (string, error) {
 	var out string
-	stack := t.stack()
 
-	for _, sgmt := range segments {
-		if DEBUG {
-			fmt.Printf(">> %-25s", sgmt.String())
-		}
+	for itm := ss.Front(); itm != nil; itm = itm.Next() {
+		d.debugf(1, ">> %s", itm)
 
-		switch {
-		case sgmt.stype == stText:
-			out += sgmt.text
-		case sgmt.start:
-			out += stack.start(sgmt)
+		switch itm.Action {
+		case item.START:
+			code := d.enterCode(itm)
+			d.debugf(1, "++ %q", code)
+			out += code
+		case item.STOP:
+			code := d.exitCode(itm)
+			d.debugf(1, "-- %q", code)
+			out += code
 		default:
-			out += stack.stop(sgmt)
-		}
-
-		if DEBUG {
-			var pad string
-			if sgmt.stype == stText {
-				pad = fmt.Sprintf("%30s", "")
-			}
-			fmt.Printf("%s[%s]\n", pad, stack)
+			out += itm.Text
 		}
 	}
 
 	return out, nil
-
-}
-
-func (t *Term) enterCode(sgmt segment) string {
-	switch sgmt.stype {
-	case stFGcolor:
-		return t.fgColor(sgmt.text)
-	case stBGcolor:
-		return t.bgColor(sgmt.text)
-	default:
-		return t.enter[sgmt.stype]
-	}
-}
-
-func (t *Term) exitCode(sgmt segment) string {
-	stype := sgmt.stype
-	switch stype {
-	case stFGcolor, stBGcolor:
-		return t.sgr0
-	default:
-		return t.exit[stype]
-	}
-}
-
-func (t *Term) fgColor(s string) string { return lookup(s, t.fg) }
-func (t *Term) bgColor(s string) string { return lookup(s, t.bg) }
-
-func lookup(color string, codes []string) string {
-	if n, ok := NumberOK(color); ok {
-		return codes[n]
-	}
-
-	if n, err := strconv.Atoi(color); err == nil {
-		return codes[n]
-	}
-
-	return fmt.Sprintf("<!color:%s>", color)
 }

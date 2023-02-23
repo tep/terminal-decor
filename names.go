@@ -1,6 +1,6 @@
 // Copyright © 2023 Timothy E. Peoples
 
-package termcolor
+package decor
 
 import "strings"
 

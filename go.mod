@@ -1,4 +1,4 @@
-module toolman.org/terminal/termcolor
+module toolman.org/terminal/decor
 
 go 1.19
 
