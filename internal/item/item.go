@@ -26,25 +26,25 @@ type Item struct {
 func AttrItem(c byte) *Item {
 	switch c {
 	case 'B':
-		return startItem(BOLD)
+		return StartItem(BOLD)
 	case 'F':
-		return startItem(FGCOLOR)
+		return StartItem(FGCOLOR)
 	case 'I':
-		return startItem(ITALIC)
+		return StartItem(ITALIC)
 	case 'K':
-		return startItem(BGCOLOR)
+		return StartItem(BGCOLOR)
 	case 'U':
-		return startItem(UNDERLINE)
+		return StartItem(UNDERLINE)
 	case 'b':
-		return stopItem(BOLD)
+		return StopItem(BOLD)
 	case 'f':
-		return stopItem(FGCOLOR)
+		return StopItem(FGCOLOR)
 	case 'i':
-		return stopItem(ITALIC)
+		return StopItem(ITALIC)
 	case 'k':
-		return stopItem(BGCOLOR)
+		return StopItem(BGCOLOR)
 	case 'u':
-		return stopItem(UNDERLINE)
+		return StopItem(UNDERLINE)
 	default:
 		return &Item{ID: nextID()}
 	}
@@ -55,21 +55,21 @@ func VarItem(name string) *Item  { return newItem(VAR, NONE, name) }
 func ErrItem(err error) *Item    { return newItem(ERROR, NONE, fmt.Sprintf("<err:%v>", err)) }
 
 func FGColorItem(color string) *Item {
-	itm := startItem(FGCOLOR)
+	itm := StartItem(FGCOLOR)
 	itm.Text = color
 	return itm
 }
 
 func BGColorItem(color string) *Item {
-	itm := startItem(FGCOLOR)
+	itm := StartItem(FGCOLOR)
 	itm.Text = color
 	return itm
 }
 
 func ErrItemf(msg string, args ...any) *Item { return ErrItem(fmt.Errorf(msg, args...)) }
 
-func startItem(stype Type) *Item { return newItem(stype, START, "") }
-func stopItem(stype Type) *Item  { return newItem(stype, STOP, "") }
+func StartItem(stype Type) *Item { return newItem(stype, START, "") }
+func StopItem(stype Type) *Item  { return newItem(stype, STOP, "") }
 
 func newItem(stype Type, action Action, text string) *Item {
 	s := &Item{

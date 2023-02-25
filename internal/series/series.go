@@ -38,15 +38,14 @@ func (s *Series) Len() int {
 }
 
 func (s *Series) Equal(o *Series) bool {
-	if s == nil && o == nil {
+	slen, olen := s.Len(), o.Len()
+
+	switch {
+	case slen == 0 && olen == 0:
 		return true
-	}
-
-	if s == nil || o == nil {
+	case slen == 0 || olen == 0:
 		return false
-	}
-
-	if s.Len() != o.Len() {
+	case slen != olen:
 		return false
 	}
 
@@ -60,7 +59,7 @@ func (s *Series) Equal(o *Series) bool {
 }
 
 func (s *Series) String() string {
-	if s == nil || s.clist == nil || s.clist.Len() == 0 {
+	if s.Len() == 0 {
 		return ""
 	}
 
@@ -114,6 +113,16 @@ func (s *Series) AppendList(other *Series) *Series {
 		s.Append(itm.Detach())
 	}
 	return s
+}
+
+func (s *Series) Clone() *Series {
+	if s.Len() == 0 {
+		return nil
+	}
+
+	ns := New()
+
+	return ns.AppendList(s)
 }
 
 func (s *Series) SegmentIDs() []string {
