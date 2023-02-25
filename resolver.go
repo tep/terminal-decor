@@ -3,12 +3,58 @@
 package decor
 
 import (
+	"fmt"
+	"strings"
+
 	"toolman.org/terminal/decor/internal/item"
 	"toolman.org/terminal/decor/internal/series"
 )
 
 func (d *Decorator) resolve(name string, values map[string]string) *series.Series {
-	d.debugf(1, "  resolving: %q", name)
+	return d.resolver().resolve(name, values)
+}
+
+// type void struct{} // XXX is this needed?
+
+type resolver struct {
+	refs map[string]string
+	*Decorator
+}
+
+func (d *Decorator) resolver() *resolver {
+	return &resolver{make(map[string]string), d}
+}
+
+func (r *resolver) checkRefs(name string) error {
+	ref, in := r.refs[name]
+	if !in {
+		return nil
+	}
+
+	refs := []string{ref}
+	circle := []string{ref, name}
+
+	for ref != name {
+		if ref = r.refs[ref]; ref != name {
+			refs = append([]string{ref}, refs...)
+		}
+	}
+
+	circle = append(circle, refs...)
+
+	return &crefError{circle}
+}
+
+type crefError struct {
+	circle []string
+}
+
+func (cre *crefError) Error() string {
+	return fmt.Sprintf("circular reference: %s", strings.Join(cre.circle, "->"))
+}
+
+func (r *resolver) resolve(name string, values map[string]string) *series.Series {
+	r.debugf(1, "  resolving: %q", name)
 
 	ss := series.New()
 	val, ok := values[name]
@@ -16,7 +62,7 @@ func (d *Decorator) resolve(name string, values map[string]string) *series.Serie
 		return ss.Append(item.ErrItemf("<undef:%s>", name))
 	}
 
-	d.debugf(1, "      value: %q", val)
+	r.debugf(1, "      value: %q", val)
 
 	if val == "" {
 		return ss.Append(item.TextItem(""))
@@ -30,9 +76,15 @@ func (d *Decorator) resolve(name string, values map[string]string) *series.Serie
 
 	var attr bool
 	for itm := ss.Front().Clone(); itm != nil; itm = itm.Next() {
-		d.debugf(2, "  ## %s", itm)
+		r.debugf(2, "  ## %s", itm)
 		if itm.Type == item.VAR {
-			out.AppendList(d.resolve(itm.Text, values))
+			if err := r.checkRefs(itm.Text); err != nil {
+				out.Append(item.ErrItem(err))
+			} else {
+				r.refs[itm.Text] = name
+				defer delete(r.refs, itm.Text)
+				out.AppendList(r.resolve(itm.Text, values))
+			}
 			continue
 		}
 
