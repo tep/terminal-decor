@@ -1,5 +1,76 @@
 // Copyright © 2023 Timothy E. Peoples
 
+// Package decor provides facilities for decorating a strings of characters
+// with display attributes for the current (or specified) terminal type. This
+// is done using a notation inspired by (but slightly different from) Zsh
+// prompt formatting.  Supported attributes are bold, italic, and/or underlined
+// characters as well as 256-color support for foreground and background
+// colors.
+//
+// As a simple example, the decor notated string provided to the Format method
+// below:
+//
+//	// error handling elided
+//	d, _ := decor.New()
+//	s, _ := d.Format("@B@F{44}@Iuser@i@F{250}@@@F{21}host@f@b")
+//	//                ^ ^     ^     ^ ^      ^ ^         ^ ^
+//	//                1 2     3     4 5      6 7         8 9
+//
+// ...has the following meaning.
+//
+//	#1. Start Bold Text
+//	#2. Start Foreground Color #44
+//	#3. Start Italics Text
+//	#4. End Italics Text
+//	#5. Start Foreground Color #250
+//	#6. A Literal '@' Character
+//	#7. Begin Foreground Color #21
+//	#8. End Foreground Color
+//	#9. End Bold Text
+//
+// Therefore, the value of s would be the string "user@host" - formatted for
+// the current terminal - in all bold text with "user" displayed in italics
+// with foreground color 44, the '@' character with color 250, and "host" shown
+// with color 21.
+//
+// All attribute designators begin with an '@' sign (for "attribute");
+// a literal '@' sign is specified as two consecutive characters (e.g. "@@").
+// The '@' sign is immediately followed by one of several capital letters
+// to begin the attribute or a lower case letter to end that attribute.
+// The full list of supported attribute designators is as follows:
+//
+//	@B (@b) - Start (stop) boldface mode
+//	@I (@i) - Start (stop) italics mode
+//	@U (@u) - Start (stop) underline mode
+//	@F (@f) - Start (stop) specified foreground color
+//	@K (@k) - Start (stop) specified background color
+//
+// The start-color designators (@F and @K) are then followed by a color name
+// or number wrapped in braces (such as "@F{DodgerBlue}"). Note that the braces
+// surrounding the color name (or number) are not limited to '{' and '}'; these
+// can be any matching pair of brace-like characters (i.e. "<color>", "[color]"
+// or "(color)") -or- any character at all, such that the beginning and ending
+// characters agree (e.g. "@F+color+").
+//
+// In addition to simple string decoration, this package also supports variable
+// expansion through templates. The above decor text could be altered to create
+// a template with the string:
+//
+//	t, _ := d.Template("@B@F{44}@I${UserName}@i@F{250}@@@F{21}${HostName}@f@b")
+//
+//	// ...later followed by...
+//
+//	s, _ := t.Format(map[string]string{"UserName": "user", "HostName": "host"})
+//
+// Here, the variables "${UserName}" and "${HostName}" would be expanded by
+// formatting the template with the provided map of variable names to values.
+//
+// Note that variable values may reference other variables and can themselves
+// contain attribute designations. Special care is taken to restore attributes
+// after a variable expansion that were in effect before the expansion started.
+// For example, if a template specifies a foreground color of "SpringGreen" and
+// a variable changes the foreground color to "DarkCyan", the foreground color
+// will be restored to "SpringGreen" once the variable has been expanded.
 package decor
 
 import (
@@ -23,6 +94,9 @@ type Decorator struct {
 	debug int
 }
 
+// New returns a new *Decorator for the terminal type specified by the $TERM
+// environment variable, or nil and an error if a new *Decorator connot be
+// created.
 func New() (*Decorator, error) {
 	ti, err := terminfo.LoadFromEnv()
 	if err != nil {
@@ -32,6 +106,9 @@ func New() (*Decorator, error) {
 	return newDecorator(ti), nil
 }
 
+// Load returns a new *Decorator for the specified terminal type (ignoring the
+// current environment) or nil and an error if a new *Decorator connot be
+// created.
 func Load(term string) (*Decorator, error) {
 	ti, err := terminfo.Load(term)
 	if err != nil {
