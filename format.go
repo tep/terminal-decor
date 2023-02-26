@@ -23,7 +23,7 @@ func (d *Decorator) Format(text string) (string, error) {
 		return "", err
 	}
 
-	return d.format(ss)
+	return d.format(ss), nil
 }
 
 // Formatf is a wrapper around Format providing a Printf like interface.
@@ -31,7 +31,7 @@ func (d *Decorator) Formatf(msg string, args ...any) (string, error) {
 	return d.Format(fmt.Sprintf(msg, args...))
 }
 
-func (d *Decorator) format(ss *series.Series) (string, error) {
+func (d *Decorator) format(ss *series.Series) string {
 	var out string
 
 	for itm := ss.Front(); itm != nil; itm = itm.Next() {
@@ -51,5 +51,5 @@ func (d *Decorator) format(ss *series.Series) (string, error) {
 		}
 	}
 
-	return out, nil
+	return out
 }

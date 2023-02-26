@@ -125,8 +125,8 @@ func (i *Item) Prev() *Item {
 	return nil
 }
 
-// Clone returns a copy of its reciever that is still attached to its
-// containing SegmentList. Use the Detach method for a detached copy.
+// Clone returns a copy of its receiver that is still attached to its
+// containing Series. Use the Detach method for a detached copy.
 func (i *Item) Clone() *Item {
 	if i == nil {
 		return nil

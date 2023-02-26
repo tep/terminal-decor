@@ -1,32 +1,8 @@
 // Copyright © 2023 Timothy E. Peoples
 
-package decor
+package colors
 
-import "strings"
-
-// Name returns the color name associated with the given number.
-//
-// Names are derived from the original X11 color names with slight
-// alterations (a suffix of 'a', 'b', etc...) where duplicate names
-// resolve to slightly different color designations.
-func Name(num int) string {
-	return names[num]
-}
-
-// Number returns the color number for the given (case-insensitive) name.
-// See 'Name' for an explanation of color names.
-func Number(name string) int {
-	return numbers[strings.ToLower(name)]
-}
-
-// NumberOK is similar to Number but returns an additional boolean value
-// indicating whether the given name actually matches a known color name.
-func NumberOK(name string) (int, bool) {
-	num, ok := numbers[strings.ToLower(name)]
-	return num, ok
-}
-
-var names = []string{
+var Names = []string{
 	"BLACK",
 	"RED",
 	"GREEN",
@@ -285,7 +261,7 @@ var names = []string{
 	"Grey93",
 }
 
-var numbers = map[string]int{
+var Numbers = map[string]int{
 	"black":             0,
 	"red":               1,
 	"green":             2,

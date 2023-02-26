@@ -8,7 +8,7 @@ import (
 	"toolman.org/terminal/decor/internal/item"
 )
 
-func TestSegment(t *testing.T) {
+func TestSeries(t *testing.T) {
 	s := New()
 
 	want := Build(

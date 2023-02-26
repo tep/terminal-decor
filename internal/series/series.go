@@ -103,7 +103,7 @@ func (s *Series) Append(itm *item.Item) *Series {
 
 	e := s.clist.PushBack(itm)
 	if !itm.Bind(e) {
-		fmt.Fprintf(os.Stderr, "segment %q failed to bind", itm)
+		fmt.Fprintf(os.Stderr, "Item %q failed to bind", itm)
 	}
 	return s
 }
@@ -125,7 +125,7 @@ func (s *Series) Clone() *Series {
 	return ns.AppendList(s)
 }
 
-func (s *Series) SegmentIDs() []string {
+func (s *Series) ItemIDs() []string {
 	if s == nil || s.Len() == 0 {
 		return nil
 	}
@@ -140,7 +140,7 @@ func (s *Series) SegmentIDs() []string {
 }
 
 // MoveToBackOrAppend examines the existing elements in its receiver's list
-// and, if one is found that is equal to the given Segment, it is moved to
+// and, if one is found that is equal to the given Item, it is moved to
 // the back of the list. Otherwise, itm is appended to the reciever's list.
 func (s *Series) MoveToBackOrAppend(itm *item.Item) *Series {
 	for it := s.Front(); it != nil; it = it.Next() {
@@ -154,8 +154,8 @@ func (s *Series) MoveToBackOrAppend(itm *item.Item) *Series {
 }
 
 // RemoveLast iterates over the receiver's list from back to front until it
-// finds a Segment of the given type, removes it, then returns the removed
-// *Segment. If no Segment is found for the give Type, a nil pointer is
+// finds an Item of the given type, removes it, then returns the removed
+// *Item. If no Item is found for the give Type, a nil pointer is
 // returned.
 func (s *Series) RemoveLast(itype item.Type) *item.Item {
 	if s == nil {

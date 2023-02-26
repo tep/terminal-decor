@@ -11,13 +11,13 @@ func (d *Decorator) optimize(input *series.Series) *series.Series {
 	output := series.New()
 	active := series.New()
 
-	d.debugf(1, "optimizing %d segments: %v", input.Len(), input.SegmentIDs())
+	d.debugf(1, "optimizing %d items: %v", input.Len(), input.ItemIDs())
 
 	for itm := input.Front(); itm != nil; itm = itm.Next() {
 		if d.debug > 1 {
 			d.debugf(2, "OS: %s", itm)
-			d.debugf(3, "    Output: %v", output.SegmentIDs())
-			d.debugf(3, "    Active: %v", active.SegmentIDs())
+			d.debugf(3, "    Output: %v", output.ItemIDs())
+			d.debugf(3, "    Active: %v", active.ItemIDs())
 		}
 
 		switch itm.Action {
@@ -52,10 +52,10 @@ func (d *Decorator) optimize(input *series.Series) *series.Series {
 		if d.isAllOff(itm) && active.Len() > 0 {
 			// If the above has turned everything off (i.e. 'sgr0') then
 			// we'll need to turn all of the 'active' stuff back on.
-			d.debugf(2, "    inserting active list after %q: %v", itm, active.SegmentIDs())
-			d.debugf(3, "      before: %v", input.SegmentIDs())
+			d.debugf(2, "    inserting active list after %q: %v", itm, active.ItemIDs())
+			d.debugf(3, "      before: %v", input.ItemIDs())
 			input.InsertAfterList(itm, active)
-			d.debugf(3, "       after: %v", input.SegmentIDs())
+			d.debugf(3, "       after: %v", input.ItemIDs())
 		}
 	}
 

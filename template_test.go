@@ -37,8 +37,8 @@ func TestTemplate(t *testing.T) {
 	vars := map[string]string{"Glyph": "@F<Orange1>Ж@f", "Key": "@F{204}ABC@f"}
 	want := "\x1b[38;5;59m[\x1b[38;5;214mЖ\x1b[38;5;59m:\x1b[3m\x1b[38;5;204mABC\x1b[38;5;59m]\x1b(B\x1b[m"
 
-	if got, err := tmpl.Format(vars); err != nil || got != want {
-		t.Errorf("tmpl.Format(%#v) == (%q, %v); Wanted (%q, nil)", vars, got, err, want)
+	if got := tmpl.Expand(vars); got != want {
+		t.Errorf("tmpl.Format(%#v) == %q; Wanted %q", vars, got, want)
 	} else {
 		t.Logf("OUT: %q", got)
 	}
