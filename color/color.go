@@ -282,7 +282,7 @@ import (
 )
 
 // Name returns the color name associated with the given number.
-func Name(num int) string {
+func Name(num uint8) string {
 	return colors.Names[num]
 }
 
