@@ -13,7 +13,7 @@ import (
 // display on the receiver's associated terminal type, or the empty string
 // and an error if it cannot do so. Note that if text contains any decor
 // variable references they will be ignored in the resultant output.
-// Create a Template and use its Format method to resolve decor variables.
+// Create a Template and use its Expand method to resolve decor variables.
 //
 // See the package documentation for more details on decor notation.
 func (d *Decorator) Format(text string) (string, error) {
