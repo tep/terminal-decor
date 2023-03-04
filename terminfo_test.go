@@ -21,7 +21,7 @@ func xterm256Decorator() (*Decorator, error) {
 		return nil, err
 	}
 
-	return newDecorator(ti), nil
+	return newDecorator("xterm-256color", ti), nil
 }
 
 // So unit tests may execute against a known terminal definition, we

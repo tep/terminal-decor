@@ -112,6 +112,7 @@ import (
 type level int32
 
 type Decorator struct {
+	term  string
 	sgr0  string
 	enter map[item.Type]string
 	exit  map[item.Type]string
@@ -129,7 +130,7 @@ func New() (*Decorator, error) {
 		return nil, err
 	}
 
-	return newDecorator(ti), nil
+	return newDecorator(os.Getenv("TERM"), ti), nil
 }
 
 // Load returns a new *Decorator for the specified terminal type (ignoring the
@@ -141,11 +142,20 @@ func Load(term string) (*Decorator, error) {
 		return nil, err
 	}
 
-	return newDecorator(ti), nil
+	return newDecorator(term, ti), nil
 }
 
-func newDecorator(ti *terminfo.Terminfo) *Decorator {
+// Term returns the terminal type used to create the receiver.
+func (d *Decorator) Term() string {
+	if d != nil {
+		return d.term
+	}
+	return ""
+}
+
+func newDecorator(term string, ti *terminfo.Terminfo) *Decorator {
 	d := &Decorator{
+		term: term,
 		sgr0: ti.Printf(terminfo.ExitAttributeMode),
 
 		enter: map[item.Type]string{
