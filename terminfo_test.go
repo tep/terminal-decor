@@ -4,9 +4,61 @@ package decor
 
 import (
 	"encoding/base64"
+	"fmt"
+	"strings"
 
 	"github.com/xo/terminfo"
 )
+
+const (
+	xt_sitm     = "\x1b[3m"
+	xt_ritm     = "\x1b[23m"
+	xt_defBG    = "\x1b[49m"
+	xt_defFG    = "\x1b[39m"
+	xt_setaf59  = "\x1b[38;5;59m"
+	xt_setaf204 = "\x1b[38;5;204m"
+	xt_setaf214 = "\x1b[38;5;214m"
+	xt_sgr0     = "\x1b(B\x1b[m"
+)
+
+func decodeAttrString(in string) string {
+	amap := map[string]string{
+		"sitm":     "\x1b[3m",
+		"ritm":     "\x1b[23m",
+		"defBG":    "\x1b[49m",
+		"defFG":    "\x1b[39m",
+		"setaf59":  "\x1b[38;5;59m",
+		"setaf204": "\x1b[38;5;204m",
+		"setaf214": "\x1b[38;5;214m",
+		"sgr0":     "\x1b(B\x1b[m",
+	}
+
+	var out string
+
+	for in != "" {
+		x := strings.IndexByte(in, 0x1b)
+		if x == -1 {
+			out += in
+			break
+		}
+
+		out += in[:x]
+		in = in[x:]
+
+		for k, v := range amap {
+			nin := strings.TrimPrefix(in, v)
+			if in == nin {
+				continue
+			}
+
+			out += fmt.Sprintf("<%s>", k)
+			in = nin
+			break
+		}
+	}
+
+	return out
+}
 
 // xterm256Decorator returns a *Decorator of a known terminal type that
 // is suitable for testing.
