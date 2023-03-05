@@ -197,3 +197,21 @@ func (s *Series) InsertAfterList(itm *item.Item, os *Series) {
 		ic.Bind(ele)
 	}
 }
+
+func (s *Series) Remove(itm *item.Item) *item.Item {
+	if s == nil || itm == nil {
+		return nil
+	}
+
+	ele := itm.Element()
+	if ele == nil {
+		return nil
+	}
+
+	val := s.clist.Remove(ele)
+	if i, ok := val.(*item.Item); ok {
+		return i
+	}
+
+	return nil
+}
