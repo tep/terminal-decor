@@ -41,7 +41,9 @@ func (t *Template) Expand(values map[string]string) string {
 	for itm := t.ss.Front(); itm != nil; itm = itm.Next() {
 		t.dec.debugf(2, "    %s", itm)
 		if itm.Type == item.VAR {
+			ss.Append(item.SaveItem())
 			ss.AppendList(t.dec.resolve(itm.Text, values))
+			ss.Append(item.RestoreItem())
 		} else {
 			ss.Append(itm.Detach())
 		}

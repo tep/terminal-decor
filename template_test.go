@@ -9,6 +9,11 @@ import (
 	"toolman.org/terminal/decor/internal/series"
 )
 
+const (
+	setaf59  = "\x1b[38;5;59m"
+	setaf214 = "\x1b[38;5;214m"
+)
+
 func TestTemplate(t *testing.T) {
 	d, err := xterm256Decorator()
 	if err != nil {
@@ -35,12 +40,18 @@ func TestTemplate(t *testing.T) {
 	}
 
 	vars := map[string]string{"Glyph": "@F<Orange1>Ж@f", "Key": "@F{204}ABC@f"}
-	want := "\x1b[38;5;59m[\x1b[38;5;214mЖ\x1b[38;5;59m:\x1b[3m\x1b[38;5;204mABC\x1b[38;5;59m]\x1b(B\x1b[m"
+	want := "" +
+		xt_setaf59 + "[" +
+		xt_setaf214 + "Ж" +
+		xt_setaf59 + ":" +
+		xt_sitm + xt_setaf204 + "ABC" +
+		xt_setaf59 + xt_ritm + "]" +
+		xt_defFG
 
 	if got := tmpl.Expand(vars); got != want {
-		t.Errorf("tmpl.Format(%#v) == %q; Wanted %q", vars, got, want)
+		t.Errorf("tmpl.Format(%#v):\n   Got: %q\nWanted: %q", vars, decodeAttrString(got), decodeAttrString(want))
 	} else {
-		t.Logf("OUT: %q", got)
+		t.Logf("OUT: %s (%s)", got, decodeAttrString(got))
 	}
 }
 
