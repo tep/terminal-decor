@@ -189,9 +189,19 @@ func (s *Series) RemoveBack() *item.Item {
 	return back
 }
 
-func (s *Series) InsertAfterList(itm *item.Item, os *Series) {
+// InsertAfterList modifies its receiver by inserting the given Series
+// immmediately following the provided Item. If itm is not found in s,
+// then ns will be appended. For example,
+//
+//	Before......: [A B C D E]
+//	Item........: C
+//	New Series..: [X Y Z]
+//	After.......: [A B C X Y Z D E]
+func (s *Series) InsertAfterList(itm *item.Item, ns *Series) {
 	ele := itm.Element()
-	for it := os.Front(); it != nil; it = it.Next() {
+	// n.b. Here we iterate over each Item in the new Series and
+	// insert it into the receiver after the "current" element.
+	for it := ns.Front(); it != nil; it = it.Next() {
 		ic := it.Clone()
 		ele = s.clist.InsertAfter(ic, ele)
 		ic.Bind(ele)
