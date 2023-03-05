@@ -16,7 +16,7 @@ func TestDecorator(t *testing.T) {
 
 	var (
 		input = "@F(Grey37)[ABC:@I123@i]@f"
-		want  = "\x1b[38;5;59m[ABC:\x1b[3m123\x1b[23m]\x1b(B\x1b[m"
+		want  = "\x1b[38;5;59m[ABC:\x1b[3m123\x1b[23m]\x1b[39m"
 	)
 
 	if got, err := d.Format(input); err != nil || got != want {

@@ -197,14 +197,21 @@ func (d *Decorator) enterCode(itm *item.Item) string {
 	}
 }
 
+const (
+	ansiDefFG = "\x1b[39m"
+	ansiDefBG = "\x1b[49m"
+)
+
 func (d *Decorator) exitCode(itm *item.Item) string {
 	if d == nil || itm == nil {
 		return ""
 	}
 
 	switch itm.Type {
-	case item.FGCOLOR, item.BGCOLOR:
-		return d.sgr0
+	case item.FGCOLOR:
+		return ansiDefFG
+	case item.BGCOLOR:
+		return ansiDefBG
 	default:
 		return d.exit[itm.Type]
 	}
