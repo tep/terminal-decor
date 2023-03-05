@@ -53,3 +53,23 @@ func (d *Decorator) format(ss *series.Series) string {
 
 	return out
 }
+
+func Strip(text string) (string, error) {
+	ss := series.New()
+
+	if err := ss.Parse(text); err != nil {
+		return "", err
+	}
+
+	var out string
+	for itm := ss.Front(); itm != nil; itm = itm.Next() {
+		switch itm.Type {
+		case item.TEXT:
+			out += itm.Text
+		case item.VAR:
+			out += fmt.Sprintf("${%s}", itm.Text)
+		}
+	}
+
+	return out, nil
+}
