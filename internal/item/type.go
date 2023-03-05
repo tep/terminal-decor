@@ -7,6 +7,7 @@ const (
 	TEXT
 	ERROR
 	VAR
+	SAVE
 
 	attrs
 
@@ -27,6 +28,8 @@ func (t Type) String() string {
 		return "ERROR"
 	case VAR:
 		return "VAR"
+	case SAVE:
+		return "SAVE"
 	case BOLD:
 		return "BOLD"
 	case UNDERLINE:

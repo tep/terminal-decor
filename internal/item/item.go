@@ -66,6 +66,9 @@ func BGColorItem(color string) *Item {
 	return itm
 }
 
+func SaveItem() *Item    { return StartItem(SAVE) }
+func RestoreItem() *Item { return StopItem(SAVE) }
+
 func ErrItemf(msg string, args ...any) *Item { return ErrItem(fmt.Errorf(msg, args...)) }
 
 func StartItem(stype Type) *Item { return newItem(stype, START, "") }
@@ -151,17 +154,22 @@ func (i *Item) String() string {
 
 	parts := []string{fmt.Sprintf("%03d", i.ID)}
 
-	if i.Type > attrs {
-		parts = append(parts, fmt.Sprintf("%s", i.Action))
+	switch {
+	case i.Type > attrs:
+		parts = []string{i.Action.String(), i.Type.String()}
+	case i.Type == SAVE && i.Action == START:
+		parts = []string{"SAVE"}
+	case i.Type == SAVE && i.Action == STOP:
+		parts = []string{"RESTORE"}
+	default:
+		parts = []string{i.Type.String()}
 	}
-
-	parts = append(parts, fmt.Sprintf("%s", i.Type))
 
 	if i.Text != "" {
 		parts = append(parts, fmt.Sprintf("%q", i.Text))
 	}
 
-	return strings.Join(parts, ":")
+	return fmt.Sprintf("%03d:%s", i.ID, strings.Join(parts, ":"))
 }
 
 func (i *Item) Equal(o *Item) bool {
