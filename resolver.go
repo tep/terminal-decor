@@ -14,8 +14,6 @@ func (d *Decorator) resolve(name string, values map[string]string) *series.Serie
 	return d.resolver().resolve(name, values)
 }
 
-// type void struct{} // XXX is this needed?
-
 type resolver struct {
 	refs map[string]string
 	*Decorator
